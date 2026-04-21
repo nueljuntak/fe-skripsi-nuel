@@ -1,0 +1,414 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Navbar from "../../components/navbar.astro";
+---
+
+<Layout title="Admin Panel">
+  <Navbar />
+
+  <main class="min-h-screen bg-[#f3f4f6] font-sans text-[#1f2937] pb-20">
+    
+    <div class="bg-[#111827] text-white shadow-md pt-6 pb-16">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+                <div>
+                    <h1 class="text-3xl font-bold uppercase tracking-wide">Admin Dashboard</h1>
+                    <p class="text-gray-400 mt-1 text-sm">Sistem Monitoring Suara Mahasiswa & Dosen</p>
+                </div>
+                <a href="/" class="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded text-sm font-bold transition">
+                    &larr; KEMBALI KE BERANDA
+                </a>
+            </div>
+            
+            <div class="flex gap-4">
+                <button onclick="switchTab('feedback')" id="btn-feedback" class="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded shadow transition">
+                    DATA MASUK
+                </button>
+                <button onclick="switchTab('questions')" id="btn-questions" class="px-6 py-2 bg-[#374151] hover:bg-[#4b5563] text-gray-200 font-bold rounded shadow transition">
+                    KELOLA PERTANYAAN
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 -mt-8">
+
+        <section id="view-feedback" class="bg-white rounded-lg shadow-lg border border-gray-200 min-h-[500px]">
+            
+            <div class="border-b border-gray-200 p-6 bg-white rounded-t-lg">
+                <div class="flex flex-col md:flex-row justify-between items-end gap-4">
+                    
+                    <div class="w-full">
+                        <h2 class="text-xl font-bold text-black flex items-center gap-2 mb-4">
+                            📥 DAFTAR MASUKAN
+                        </h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div>
+                                <label class="text-xs font-bold text-gray-500 uppercase block mb-1">Role User</label>
+                                <select id="filter-role" onchange="applyFilters()" class="w-full border border-gray-300 bg-gray-50 text-sm rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none text-gray-700">
+                                    <option value="">Semua Role</option>
+                                    <option value="mahasiswa">Mahasiswa</option>
+                                    <option value="dosen">Dosen</option>
+                                    <option value="administrator">Administrator</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-xs font-bold text-gray-500 uppercase block mb-1">Fakultas</label>
+                                <select id="filter-fakultas" onchange="applyFilters()" class="w-full border border-gray-300 bg-gray-50 text-sm rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none text-gray-700">
+                                    <option value="">Semua Fakultas</option>
+                                    </select>
+                            </div>
+
+                            <div>
+                                <label class="text-xs font-bold text-gray-500 uppercase block mb-1">Waktu</label>
+                                <select id="filter-sort" onchange="applyFilters()" class="w-full border border-gray-300 bg-gray-50 text-sm rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none text-gray-700">
+                                    <option value="-tanggal_kirim">Terbaru (Newest)</option>
+                                    <option value="tanggal_kirim">Terlama (Oldest)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="applyFilters()" class="shrink-0 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded text-sm transition border border-gray-300">
+                        🔄 REFRESH
+                    </button>
+                </div>
+            </div>
+
+            <div id="feedback-container" class="p-6 space-y-4 bg-gray-50">
+                <div class="text-center py-10">
+                    <span class="font-bold text-gray-500">Sedang memuat data...</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-questions" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-6 h-fit">
+                <h3 class="font-bold text-lg text-black mb-4 pb-2 border-b border-gray-200">TAMBAH PERTANYAAN</h3>
+                <form id="addQuestionForm" class="flex flex-col gap-4">
+                    <div>
+                        <label class="block font-bold text-xs text-gray-500 uppercase mb-1">Target</label>
+                        <select id="q_role" class="w-full border border-gray-300 bg-gray-50 rounded p-2 text-black font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+                            <option value="mahasiswa">MAHASISWA</option>
+                            <option value="dosen">DOSEN</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-xs text-gray-500 uppercase mb-1">Isi Pertanyaan</label>
+                        <textarea id="q_text" rows="3" class="w-full border border-gray-300 bg-gray-50 rounded p-2 text-black font-medium focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Ketik pertanyaan..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-xs text-gray-500 uppercase mb-1">Status Awal</label>
+                        <select id="q_status" class="w-full border border-gray-300 bg-gray-50 rounded p-2 text-black font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+                            <option value="aktif">AKTIF (Tampil)</option>
+                            <option value="nonaktif">DRAFT (Sembunyi)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-xs text-gray-500 uppercase mb-1">Urutan</label>
+                        <input type="number" id="q_urutan" value="1" class="w-full border border-gray-300 bg-gray-50 rounded p-2 text-black font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded shadow transition">
+                        SIMPAN PERTANYAAN
+                    </button>
+                </form>
+            </div>
+
+            <div class="lg:col-span-2 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+                <div class="bg-gray-800 text-white p-4 flex justify-between items-center">
+                    <span class="font-bold uppercase text-sm tracking-wider">Daftar Pertanyaan</span>
+                    <span class="text-xs text-gray-400 normal-case">*Ubah nilai di tabel untuk menyimpan otomatis</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-100 text-gray-600 border-b border-gray-300">
+                            <tr>
+                                <th class="p-4 font-bold text-xs uppercase w-20">Urutan</th>
+                                <th class="p-4 font-bold text-xs uppercase">Pertanyaan</th>
+                                <th class="p-4 font-bold text-xs uppercase w-24">Target</th>
+                                <th class="p-4 font-bold text-xs uppercase w-32">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="questions-table-body" class="divide-y divide-gray-200 bg-white">
+                            <tr><td colspan="4" class="p-4 text-center text-gray-500">Memuat...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </div>
+  </main>
+
+  <script is:inline>
+    const API_URL = "https://nueljunt-backend-skripsi-nuel.hf.space";
+    let token = localStorage.getItem("access_token");
+
+    // --- CEK LOGIN & AUTH ---
+    async function checkAuth() {
+        if(!token) { window.location.href = "/auth/login"; return; }
+        try {
+            const res = await fetch(`${API_URL}/users/me?fields=role.name`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const userData = await res.json();
+            if (!userData.data || userData.data.role?.name !== 'Administrator') {
+                alert("Akses Ditolak: Khusus Administrator.");
+                window.location.href = "/"; 
+            } else {
+                loadFakultasDropdown();
+                applyFilters();
+                loadQuestions();
+            }
+        } catch (e) { window.location.href = "/auth/login"; }
+    }
+    checkAuth();
+
+    // --- SWITCH TAB ---
+    window.switchTab = (tab) => {
+        const viewF = document.getElementById('view-feedback');
+        const viewQ = document.getElementById('view-questions');
+        const btnF = document.getElementById('btn-feedback');
+        const btnQ = document.getElementById('btn-questions');
+
+        const activeStyle = "px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded shadow transition";
+        const inactiveStyle = "px-6 py-2 bg-[#374151] hover:bg-[#4b5563] text-gray-200 font-bold rounded shadow transition";
+
+        if(tab === 'feedback') {
+            viewF.classList.remove('hidden'); viewQ.classList.add('hidden');
+            btnF.className = activeStyle; btnQ.className = inactiveStyle;
+        } else {
+            viewF.classList.add('hidden'); viewQ.classList.remove('hidden');
+            btnQ.className = activeStyle; btnF.className = inactiveStyle;
+        }
+    };
+
+    // --- 1. Load Dropdown Fakultas ---
+    async function loadFakultasDropdown() {
+        try {
+            const res = await fetch(`${API_URL}/items/fakultas?sort=nama_fakultas`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const { data } = await res.json();
+            const select = document.getElementById('filter-fakultas');
+            data.forEach(f => {
+                const opt = document.createElement('option');
+                opt.value = f.id;
+                opt.innerText = f.nama_fakultas;
+                select.appendChild(opt);
+            });
+        } catch(e) { console.error("Gagal load fakultas", e); }
+    }
+
+    // --- 2. Apply Filters (PERBAIKAN UTAMA DISINI) ---
+    window.applyFilters = async () => {
+        const role = document.getElementById('filter-role').value;
+        const facId = document.getElementById('filter-fakultas').value;
+        const sortVal = document.getElementById('filter-sort').value;
+
+        const container = document.getElementById('feedback-container');
+        container.innerHTML = '<div class="text-center font-bold text-gray-500 py-4">Mengambil data...</div>';
+
+        try {
+            const fields = [
+                'id,tanggal_kirim,komentar',
+                'user_id.nama_lengkap,user_id.role.name,user_id.nim',
+                'fakultas_id.nama_fakultas',
+                'analisis_detail.sentimen,analisis_detail.kategori,analisis_detail.text_potongan',
+                'jawaban_feedback.jawaban,jawaban_feedback.pertanyaan_id.pertanyaan'
+            ].join(',');
+
+            let query = `${API_URL}/items/feedback?fields=${fields}&sort=${sortVal}`;
+            
+            // --- FIX: Menggunakan _icontains agar tidak sensitif huruf besar/kecil ---
+            if(role) {
+                query += `&filter[user_id][role][name][_icontains]=${role}`;
+            }
+            if(facId) {
+                query += `&filter[fakultas_id][id][_eq]=${facId}`;
+            }
+
+            const res = await fetch(query, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const { data } = await res.json();
+
+            renderFeedbackList(data);
+
+        } catch(e) {
+            console.error(e);
+            container.innerHTML = '<div class="p-4 bg-red-100 text-red-800 font-bold text-center border border-red-300">Gagal filter data.</div>';
+        }
+    }
+
+    function renderFeedbackList(data) {
+        const container = document.getElementById('feedback-container');
+        if(!data || data.length === 0) {
+            container.innerHTML = '<div class="p-8 text-center text-gray-500 border-2 border-dashed border-gray-300 rounded">Tidak ada data yang cocok dengan filter ini.</div>';
+            return;
+        }
+
+        container.innerHTML = data.map(item => {
+            const nama = item.user_id?.nama_lengkap || "Tanpa Nama";
+            const nim = item.user_id?.nim || "-";
+            const role = item.user_id?.role?.name || "User";
+            const fakultas = item.fakultas_id?.nama_fakultas || "-";
+            const date = new Date(item.tanggal_kirim).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute:'2-digit'});
+
+            let sentimentBadge = '<span class="bg-gray-200 text-gray-700 px-2 py-1 text-xs font-bold rounded">BELUM DIANALISIS</span>';
+            if(item.analisis_detail?.length > 0) {
+                const isPos = item.analisis_detail.some(x => x.sentimen?.toLowerCase().includes('positif'));
+                if(isPos) sentimentBadge = '<span class="bg-green-100 text-green-800 border border-green-200 px-2 py-1 text-xs font-bold rounded">POSITIF 😊</span>';
+                else sentimentBadge = '<span class="bg-red-100 text-red-800 border border-red-200 px-2 py-1 text-xs font-bold rounded">NEGATIF 😟</span>';
+            }
+
+            return `
+            <div class="bg-white border border-gray-300 rounded shadow-sm hover:shadow-md transition">
+                <div class="p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 cursor-pointer" onclick="toggleDetail('${item.id}')">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="bg-blue-900 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">${role}</span>
+                            <span class="text-xs text-gray-500 font-medium">${date}</span>
+                        </div>
+                        <h4 class="text-lg font-bold text-gray-900">${nama}</h4>
+                        <p class="text-sm font-mono text-gray-500 font-bold">NIM: ${nim}</p>
+                        <p class="text-sm text-gray-600 mt-1">${fakultas}</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        ${sentimentBadge}
+                        <button id="btn-arrow-${item.id}" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 font-bold hover:bg-gray-200 transition">&darr;</button>
+                    </div>
+                </div>
+                <div id="detail-${item.id}" class="hidden bg-gray-50 border-t border-gray-200 p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h5 class="font-bold text-gray-900 text-sm uppercase border-b border-gray-300 pb-1 mb-2">Isi Komentar</h5>
+                            <div class="bg-white p-3 border border-gray-300 text-gray-800 italic rounded shadow-sm">"${item.komentar}"</div>
+                            <h5 class="font-bold text-gray-900 text-sm uppercase border-b border-gray-300 pb-1 mt-6 mb-2">Analisis AI</h5>
+                            <div class="space-y-2">${renderAnalisis(item.analisis_detail)}</div>
+                        </div>
+                        <div>
+                            <h5 class="font-bold text-gray-900 text-sm uppercase border-b border-gray-300 pb-1 mb-2">Jawaban Kuesioner</h5>
+                            <div class="bg-white border border-gray-300 rounded overflow-hidden shadow-sm">
+                                <table class="w-full text-sm">${renderKuesioner(item.jawaban_feedback)}</table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function renderAnalisis(list) {
+        if(!list || !list.length) return '<div class="text-xs text-gray-400">Tidak ada data analisis.</div>';
+        return list.map(x => {
+            const s = x.sentimen?.toLowerCase() || "";
+            let style = "bg-gray-100 border-gray-200 text-gray-600";
+            if (s.includes('positif')) style = "bg-green-50 border-green-200 text-green-800";
+            else if (s.includes('negatif')) style = "bg-red-50 border-red-200 text-red-800";
+            const snippet = x.text_potongan ? `"${x.text_potongan}"` : '(Teks tidak terdeteksi)';
+            return `<div class="flex flex-col border p-2 rounded ${style}">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="font-bold text-xs uppercase">${x.kategori || 'UMUM'}</span>
+                    <span class="text-[10px] uppercase font-bold border px-1 rounded bg-white bg-opacity-50 border-black/10">${x.sentimen}</span>
+                </div>
+                <div class="text-sm font-medium italic opacity-90">${snippet}</div>
+            </div>`;
+        }).join('');
+    }
+
+    function renderKuesioner(list) {
+        if(!list || !list.length) return '<tr><td class="p-3 text-center text-gray-400 italic">Tidak ada kuesioner</td></tr>';
+        return list.map(j => `
+            <tr class="border-b border-gray-100 last:border-0">
+                <td class="p-2 text-gray-700 font-medium">${j.pertanyaan_id?.pertanyaan || "Pertanyaan dihapus"}</td>
+                <td class="p-2 text-center font-bold text-black bg-gray-50 w-12 border-l border-gray-200">${j.jawaban}</td>
+            </tr>
+        `).join('');
+    }
+
+    window.toggleDetail = (id) => {
+        const el = document.getElementById(`detail-${id}`);
+        const btn = document.getElementById(`btn-arrow-${id}`);
+        el.classList.toggle('hidden');
+        if(!el.classList.contains('hidden')) {
+            btn.innerHTML = "&uarr;"; btn.classList.add("bg-blue-100", "text-blue-700");
+        } else {
+            btn.innerHTML = "&darr;"; btn.classList.remove("bg-blue-100", "text-blue-700");
+        }
+    }
+
+    // --- LOGIC PERTANYAAN ---
+    async function loadQuestions() {
+        const tbody = document.getElementById('questions-table-body');
+        try {
+            const res = await fetch(`${API_URL}/items/pertanyaan_feedback?sort=urutan`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const { data } = await res.json();
+            
+            if(!data.length) {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Belum ada data.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map((q) => {
+                const isAktif = q.status === 'aktif';
+                return `
+                <tr class="hover:bg-gray-50 text-gray-800 border-b border-gray-100 transition">
+                    <td class="p-2">
+                        <input type="number" value="${q.urutan}" class="w-16 border border-gray-300 rounded p-1 text-center font-bold text-gray-700 focus:ring-2 focus:ring-blue-500 outline-none" onchange="updateQuestion('${q.id}', 'urutan', this.value)">
+                    </td>
+                    <td class="p-4 font-medium text-gray-900">${q.pertanyaan}</td>
+                    <td class="p-4 uppercase text-xs font-bold text-gray-500">${q.role}</td>
+                    <td class="p-2">
+                        <select onchange="updateQuestion('${q.id}', 'status', this.value)" class="text-xs font-bold uppercase rounded p-1.5 border border-gray-300 outline-none cursor-pointer ${isAktif ? 'bg-green-100 text-green-800 border-green-200' : 'bg-gray-200 text-gray-600'}">
+                            <option value="aktif" ${isAktif ? 'selected' : ''}>AKTIF</option>
+                            <option value="nonaktif" ${!isAktif ? 'selected' : ''}>NONAKTIF</option>
+                        </select>
+                    </td>
+                </tr>
+            `}).join('');
+        } catch(e) { console.error(e); }
+    }
+
+    window.updateQuestion = async (id, field, value) => {
+        try {
+            const res = await fetch(`${API_URL}/items/pertanyaan_feedback/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ [field]: value })
+            });
+            if(res.ok) loadQuestions();
+            else alert("Gagal mengupdate data.");
+        } catch(e) { console.error(e); alert("Terjadi kesalahan koneksi."); }
+    }
+
+    document.getElementById('addQuestionForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('button');
+        const oldText = btn.innerText;
+        btn.innerText = "MENYIMPAN..."; btn.disabled = true;
+
+        try {
+            await fetch(`${API_URL}/items/pertanyaan_feedback`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({
+                    role: document.getElementById('q_role').value,
+                    pertanyaan: document.getElementById('q_text').value,
+                    status: document.getElementById('q_status').value,
+                    urutan: document.getElementById('q_urutan').value || 99
+                })
+            });
+            loadQuestions();
+            document.getElementById('q_text').value = "";
+            alert("Pertanyaan berhasil ditambahkan!");
+        } catch(e) { alert("Gagal menyimpan."); }
+        finally { btn.innerText = oldText; btn.disabled = false; }
+    });
+  </script>
+</Layout>

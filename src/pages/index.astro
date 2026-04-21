@@ -1,16 +1,346 @@
 ---
-
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/navbar.astro";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="UKRIM Feedback Portal">
+    <Navbar />
+
+    <main class="container mx-auto px-6 mt-8 md:mt-16 mb-20 relative">
+        <div class="flex flex-col md:flex-row items-center gap-12 mb-32">
+            <div class="md:w-1/2 space-y-6">
+                <h1
+                    class="text-4xl md:text-6xl font-black text-gray-900 dark:text-white leading-tight"
+                >
+                    SUARA <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"
+                        >KITA</span
+                    ><br />
+                    MEMBANGUN <br />
+                    <span class="text-blue-600 dark:text-blue-400">UKRIM.</span>
+                </h1>
+                <p class="text-gray-600 dark:text-gray-400 text-lg">
+                    Platform resmi untuk menyampaikan aspirasi, kritik, dan
+                    saran secara aman, transparan, dan berdampak.
+                </p>
+
+                <div class="flex gap-4 pt-2">
+                    <a
+                        href="/feedback"
+                        class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg shadow-blue-500/30 transition transform hover:-translate-y-1"
+                    >
+                        Tulis Feedback
+                    </a>
+                    <a
+                        href="#stats-section"
+                        class="px-8 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-white font-bold rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+                    >
+                        Statistik
+                    </a>
+                </div>
+            </div>
+
+            <div class="md:w-1/2 flex justify-center relative">
+                <div
+                    class="absolute inset-0 bg-blue-500/20 blur-[80px] rounded-full -z-10"
+                >
+                </div>
+                <img
+                    src="/images/diskusi.png"
+                    alt="Ilustrasi Diskusi"
+                    class="w-full max-w-md drop-shadow-2xl animate-float"
+                />
+            </div>
+        </div>
+
+        <div id="stats-section" class="mb-32">
+            <div class="text-center mb-12">
+                <h2
+                    class="text-2xl font-bold text-gray-900 dark:text-white uppercase tracking-widest"
+                >
+                    Fakultas
+                </h2>
+                <p class="text-xs text-gray-500 uppercase tracking-widest mt-2">
+                    Tingkat Kepuasan Real-Time (Sentimen Positif AI)
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+                {
+                    ["FEBI", "FAK", "FT", "FISKOM", "FARMASI"].map(
+                        (fakultas) => (
+                            <div class="bg-[#0a0a0a] border border-gray-800 rounded-3xl p-6 flex flex-col gap-4 hover:border-blue-600 transition group relative overflow-hidden">
+                                <div class="absolute top-0 right-0 w-20 h-20 bg-blue-500/10 blur-[40px] rounded-full group-hover:bg-blue-500/20 transition" />
+
+                                <h3 class="text-white font-bold text-lg">
+                                    {fakultas}
+                                </h3>
+
+                                <div class="flex items-center gap-2 text-gray-400 text-sm">
+                                    <span class="text-blue-500">📝</span>
+                                    <span id={`count-${fakultas}`}>
+                                        0 Feedback
+                                    </span>
+                                </div>
+
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-[10px] text-gray-500 uppercase tracking-wider">
+                                        Kepuasan Positif
+                                    </span>
+                                    <div class="flex items-center gap-2">
+                                        <span
+                                            class="text-xl font-black text-white transition-colors duration-300"
+                                            id={`percent-${fakultas}`}
+                                        >
+                                            0%
+                                        </span>
+                                    </div>
+                                    <div class="w-full bg-gray-800 h-1.5 rounded-full mt-1 overflow-hidden">
+                                        <div
+                                            id={`bar-${fakultas}`}
+                                            class="bg-gray-600 h-full w-0 transition-all duration-1000"
+                                        />
+                                    </div>
+                                </div>
+
+                                <a
+                                    href={`/fakultas/${fakultas.toLowerCase()}`}
+                                    class="mt-4 text-xs text-blue-500 font-semibold group-hover:underline z-10"
+                                >
+                                    Lihat detail...
+                                </a>
+                            </div>
+                        ),
+                    )
+                }
+            </div>
+
+            <div class="mt-10 flex justify-center">
+                <a
+                    href="/fakultas"
+                    class="group flex items-center gap-2 px-8 py-3 bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 hover:border-blue-600 text-gray-900 dark:text-white font-bold rounded-2xl transition-all duration-300 shadow-sm hover:shadow-blue-500/20"
+                >
+                    <span>Lihat Semua Detail Fakultas</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="mb-32">
+            <div class="flex justify-between items-end mb-6">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                    💬 Suara Terbaru
+                </h2>
+            </div>
+
+            <div
+                id="feedback-container"
+                class="grid grid-cols-1 md:grid-cols-3 gap-6"
+            >
+                <div class="col-span-3 text-center py-12">
+                    <span
+                        class="inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"
+                    ></span>
+                    <p class="mt-2 text-gray-500 text-sm">
+                        Sedang memuat data...
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="relative py-20 text-center mb-10">
+            <div
+                class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-blue-600/30 blur-[100px] rounded-full pointer-events-none -z-10"
+            >
+            </div>
+            <h2
+                class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-8"
+            >
+                Ayo Berkontribusi Untuk Kemajuan UKRIM !
+            </h2>
+            <a
+                href="/feedback"
+                class="inline-flex items-center justify-center px-8 py-3 text-base font-bold text-white transition-all duration-200 bg-blue-600 rounded-full hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-1"
+            >
+                Mulai Beri Feedback
+            </a>
+        </div>
+    </main>
+
+    <footer
+        class="container mx-auto px-6 py-10 flex flex-col md:flex-row justify-between items-center gap-6 border-t border-gray-200 dark:border-gray-800 mt-auto bg-white dark:bg-[#050505]"
+    >
+        <div
+            class="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity"
+        >
+            <div
+                class="w-8 h-8 rounded-full bg-white overflow-hidden border border-gray-200"
+            >
+                <img
+                    src="/images/logo-ukrim.jpg"
+                    alt="Logo"
+                    class="w-full h-full object-cover"
+                />
+            </div>
+            <span class="text-[10px] font-bold text-gray-500 leading-tight"
+                >UNIVERSITAS<br />KRISTEN<br />IMMANUEL</span
+            >
+        </div>
+
+        <div
+            class="flex items-center gap-6 md:gap-8 text-[10px] md:text-xs font-bold text-gray-500 tracking-wider"
+        >
+            <a href="/feedback" class="hover:text-blue-500 transition"
+                >BERI FEEDBACK</a
+            >
+            <a href="/fakultas" class="hover:text-blue-500 transition"
+                >FAKULTAS</a
+            >
+            
+            <a href="/admin" class="hover:text-blue-500 transition flex items-center gap-1 group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-gray-400 group-hover:text-blue-500 transition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                ADMIN
+            </a>
+
+            <a href="/" class="text-blue-500 transition">HOME</a>
+        </div>
+    </footer>
+
+    <style>
+        @keyframes float {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+    </style>
+
+    <script is:inline>
+        // 1. FUNGSI UPDATE UI KARTU FAKULTAS (Tetap sama)
+        function updateFacultyCard(kode, stats) {
+            const elCount = document.getElementById(`count-${kode}`);
+            const elPercent = document.getElementById(`percent-${kode}`);
+            const elBar = document.getElementById(`bar-${kode}`);
+
+            if (!stats) {
+                if (elCount) elCount.innerText = "0 Feedback";
+                if (elPercent) elPercent.innerText = "0%";
+                if (elBar) elBar.style.width = "0%";
+                return;
+            }
+
+            if (elCount) elCount.innerText = `${stats.count} Feedback`;
+
+            const total = stats.total_aspek;
+            const positif = stats.ai_positif;
+            const persen = total > 0 ? Math.round((positif / total) * 100) : 0;
+
+            if (elPercent) elPercent.innerText = `${persen}%`;
+
+            if (elBar) {
+                elBar.style.width = `${persen}%`;
+                // Warna Bar Statistik Fakultas
+                if (persen >= 70)
+                    elBar.className =
+                        "bg-green-500 h-full transition-all duration-1000";
+                else if (persen >= 40)
+                    elBar.className =
+                        "bg-yellow-500 h-full transition-all duration-1000";
+                else
+                    elBar.className =
+                        "bg-red-500 h-full transition-all duration-1000";
+            }
+        }
+
+        // 2. FUNGSI FETCH DATA UTAMA
+        async function loadDashboardData() {
+            try {
+                const res = await fetch("/api/feedback.json");
+                if (!res.ok) throw new Error("Gagal fetch API");
+
+                const data = await res.json();
+
+                // --- A. UPDATE STATISTIK FAKULTAS ---
+                const facultyCodes = ["FEBI", "FAK", "FT", "FISKOM", "FARMASI"];
+                const statsData = data.stats?.faculties || {};
+                facultyCodes.forEach((kode) => {
+                    updateFacultyCard(kode, statsData[kode]);
+                });
+
+                // --- B. UPDATE FEEDBACK LIST (BERSIH & RAPI) ---
+                const container = document.getElementById("feedback-container");
+                const feedbackList = data.feedbacks || [];
+
+                if (feedbackList.length === 0) {
+                    if (container)
+                        container.innerHTML = `<div class="col-span-3 text-center text-gray-500 italic p-8">Belum ada data feedback yang masuk.</div>`;
+                } else {
+                    if (container) container.innerHTML = "";
+
+                    feedbackList.forEach((item) => {
+                        // Format Tanggal
+                        const dateObj = new Date(item.tanggal_kirim);
+                        const displayDate = !isNaN(dateObj)
+                            ? dateObj.toLocaleDateString("id-ID", {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                              })
+                            : "-";
+
+                        // Logic Role User
+                        const isDosen =
+                            item.kategori_user?.toLowerCase() === "dosen";
+                        const roleLabel = isDosen ? "Dosen" : "Mahasiswa";
+                        const roleColor = isDosen
+                            ? "bg-blue-100 text-blue-600"
+                            : "bg-gray-100 text-gray-600";
+                        const roleIcon = isDosen ? "👨‍🏫" : "🎓";
+
+                        // Kartu Tanpa Badge Sentimen
+                        const cardHTML = `
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col h-full hover:shadow-md transition group relative overflow-hidden">
+                        
+                        <div class="flex justify-between items-start mb-4 relative z-10">
+                            <span class="px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 text-[10px] font-bold uppercase rounded">
+                                ${item.kode_fakultas}
+                            </span>
+                        </div>
+                        
+                        <div class="flex-grow relative z-10">
+                            <p class="text-gray-700 dark:text-gray-300 text-sm italic leading-relaxed">
+                                "${item.komentar || "Tidak ada teks."}"
+                            </p>
+                        </div>
+
+                        <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center gap-3 relative z-10">
+                            <div class="w-8 h-8 rounded-full ${roleColor} flex items-center justify-center text-xs shadow-sm">
+                                ${roleIcon}
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wide">${roleLabel}</p>
+                                <p class="text-[10px] text-gray-400">${displayDate}</p>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                        if (container)
+                            container.insertAdjacentHTML("beforeend", cardHTML);
+                    });
+                }
+            } catch (error) {
+                console.error("Dashboard Error:", error);
+                const container = document.getElementById("feedback-container");
+                if (container)
+                    container.innerHTML = `<div class="col-span-3 text-center text-red-500 p-4">Gagal memuat data.</div>`;
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", loadDashboardData);
+    </script>
+</Layout>

@@ -1,0 +1,58 @@
+---
+import ThemeToggle from "./ThemeToggle";
+---
+
+<nav class="container mx-auto px-6 py-6 flex justify-between items-center relative z-20">
+    <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center border-2 border-white shadow-sm overflow-hidden">
+            <img
+                src="/images/logo-ukrim.jpg"
+                alt="Logo UKRIM"
+                class="w-full h-full object-cover"
+            />
+        </div>
+        <div class="text-xs font-bold leading-tight tracking-wider text-gray-700 dark:text-gray-200">
+            UNIVERSITAS<br />KRISTEN<br />IMMANUEL
+        </div>
+    </div>
+    <div class="flex items-center gap-4">
+        <ThemeToggle client:load />
+        
+        <div id="auth-nav">
+            <a
+                href="/auth/login"
+                class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-blue-600 transition"
+                >Login</a
+            >
+        </div>
+    </div>
+</nav>
+
+<script is:inline>
+    (function () {
+        const authNav = document.getElementById("auth-nav");
+        const token = localStorage.getItem("access_token");
+        const userProfileRaw = localStorage.getItem("user_profile");
+
+        if (token && userProfileRaw) {
+            try {
+                const user = JSON.parse(userProfileRaw);
+                authNav.innerHTML = `
+      <div class="flex items-center gap-4">
+        <span class="text-sm font-bold text-blue-600 dark:text-blue-400">Hi, ${user.nama_panggilan || 'User'}</span>
+        <button id="logoutBtn" class="text-xs font-bold text-red-500 hover:text-red-700 transition uppercase">Keluar</button>
+      </div>
+    `;
+                document
+                    .getElementById("logoutBtn")
+                    ?.addEventListener("click", () => {
+                        localStorage.removeItem("access_token");
+                        localStorage.removeItem("user_profile");
+                        window.location.href = "/"; 
+                    });
+            } catch (e) {
+                console.error("Error parsing user profile", e);
+            }
+        }
+    })();
+</script>

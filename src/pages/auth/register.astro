@@ -1,0 +1,189 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import ThemeToggle from "../../components/ThemeToggle";
+
+// Pastikan URL ini sesuai dengan backend kamu
+const API_URL = "https://nueljunt-backend-skripsi-nuel.hf.space";
+---
+
+<Layout title="Daftar Akun - UKRIM Feedback">
+  <nav class="container mx-auto px-6 py-6 flex justify-between items-center relative z-20">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center border-2 border-white shadow-sm overflow-hidden">
+        <img src="/images/logo-ukrim.jpg" alt="Logo UKRIM" class="w-full h-full object-cover" />
+      </div>
+      <div class="text-xs font-bold leading-tight tracking-wider text-gray-700 dark:text-gray-200 uppercase">
+        Universitas<br />Kristen<br />Immanuel
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+      <ThemeToggle client:load />
+      <a href="/" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-blue-600 transition">Beranda</a>
+    </div>
+  </nav>
+
+  <main class="container mx-auto px-6 py-12 relative min-h-[80vh] flex items-center justify-center">
+    <div class="absolute inset-0 flex justify-center items-center -z-10">
+      <div class="w-full max-w-lg h-96 bg-blue-500/20 dark:bg-blue-600/10 blur-[120px] rounded-full"></div>
+    </div>
+
+    <div class="w-full max-w-2xl">
+      <div class="bg-white dark:bg-[#111827] border border-gray-100 dark:border-gray-800 p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-blue-500/5 transition-colors duration-300">
+        <div class="text-center mb-10">
+          <h1 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-3 uppercase tracking-tight">
+            GABUNG <span class="text-blue-600">KOMUNITAS.</span>
+          </h1>
+          <p class="text-gray-500 dark:text-gray-400">
+            Lengkapi data diri untuk mulai berkontribusi.
+          </p>
+        </div>
+
+        <form id="registerForm" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Nama Lengkap</label>
+            <input type="text" id="nama_lengkap" required class="w-full bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-2xl px-5 py-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Nama Panggilan</label>
+            <input type="text" id="nama_panggilan" required class="w-full bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-2xl px-5 py-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">NIM / NIDN</label>
+            <input type="text" id="nim" required class="w-full bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-2xl px-5 py-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Status</label>
+            <select id="role" required class="w-full bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-2xl px-5 py-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all appearance-none cursor-pointer">
+              <option value="">Pilih Role</option>
+              <option value="8ed9292e-7bd7-49b9-8b7f-28af09025902">Mahasiswa</option>
+              <option value="830d15cc-a6a0-4a9a-a4c7-6f73fd5eaddf">Dosen</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Fakultas</label>
+            <select id="fakultas_select" required class="w-full bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-2xl px-5 py-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all appearance-none cursor-pointer">
+              <option value="">Memuat Data...</option>
+            </select>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Email Universitas</label>
+            <input type="email" id="email" required class="w-full bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-2xl px-5 py-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all" />
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Password</label>
+            <input type="password" id="password" required class="w-full bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-2xl px-5 py-4 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all" />
+          </div>
+
+          <button type="submit" id="btnSubmit" class="md:col-span-2 mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition transform hover:-translate-y-1 shadow-lg shadow-blue-500/30 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+            Daftar Sekarang
+          </button>
+        </form>
+
+        <p class="text-center text-gray-500 dark:text-gray-400 text-sm mt-8">
+          Sudah punya akun? <a href="/auth/login" class="text-blue-600 dark:text-blue-400 font-bold hover:underline">Masuk</a>
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <script is:inline>
+    const API_URL = "https://nueljunt-backend-skripsi-nuel.hf.space";
+    const registerForm = document.getElementById("registerForm");
+    const fakultasSelect = document.getElementById("fakultas_select");
+    const btnSubmit = document.getElementById("btnSubmit");
+
+    // 1. Fetch Data Fakultas
+    (async function fetchFakultas() {
+      try {
+        const response = await fetch(`${API_URL}/items/fakultas?sort=nama_fakultas`);
+        const result = await response.json();
+        
+        if (result.data) {
+          fakultasSelect.innerHTML = '<option value="">Pilih Fakultas</option>';
+          result.data.forEach(fak => {
+            const option = document.createElement("option");
+            option.value = fak.id; 
+            option.textContent = fak.nama_fakultas;
+            fakultasSelect.appendChild(option);
+          });
+        }
+      } catch (err) {
+        console.error("Gagal mengambil data fakultas:", err);
+        fakultasSelect.innerHTML = '<option value="">Gagal memuat data</option>';
+      }
+    })();
+
+    // 2. Handle Register
+    registerForm?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      // Matikan tombol agar tidak double submit
+      btnSubmit.disabled = true;
+      btnSubmit.innerText = "Memproses...";
+
+      const fID = fakultasSelect.value;
+      const payload = {
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value,
+        first_name: document.getElementById("nama_panggilan").value,
+        last_name: ".",
+        nama_lengkap: document.getElementById("nama_lengkap").value,
+        nama_panggilan: document.getElementById("nama_panggilan").value,
+        nim: document.getElementById("nim").value,
+        fakultas: parseInt(fID), 
+        role: document.getElementById("role").value,
+      };
+
+      try {
+        const response = await fetch(`${API_URL}/users`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        // Parse JSON
+        const result = await response.json().catch(() => ({}));
+
+        // === LOGIKA PENGECEKAN SUKSES/GAGAL ===
+        if (response.ok) {
+            // Jika status 200/201 (Berhasil)
+            alert("Pendaftaran Berhasil! Silakan Login.");
+            window.location.href = "/auth/login";
+        } else {
+            // Jika Gagal (misal status 400, 403, 409)
+            let errorMessage = "Terjadi kesalahan saat mendaftar.";
+            
+            // Cek apakah ada error array dari Directus
+            if (result.errors && result.errors.length > 0) {
+                const errorCode = result.errors[0]?.extensions?.code;
+                
+                // Cek kode khusus RECORD_NOT_UNIQUE (Data kembar)
+                if (errorCode === 'RECORD_NOT_UNIQUE') {
+                    errorMessage = "GAGAL: Email atau NIM sudah terdaftar! Silakan periksa kembali data Anda.";
+                } else {
+                    // Pesan error lain dari server
+                    errorMessage = "GAGAL: " + result.errors[0].message;
+                }
+            }
+
+            alert(errorMessage);
+        }
+
+      } catch (err) {
+        console.error("Fetch Error:", err);
+        alert("Terjadi kendala koneksi ke server.");
+      } finally {
+        // Hidupkan tombol kembali
+        btnSubmit.disabled = false;
+        btnSubmit.innerText = "Daftar Sekarang";
+      }
+    });
+  </script>
+</Layout>

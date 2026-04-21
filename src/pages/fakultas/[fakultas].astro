@@ -1,0 +1,523 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Navbar from "../../components/navbar.astro";
+
+export function getStaticPaths() {
+    return [
+        { params: { fakultas: "fak" } },
+        { params: { fakultas: "ft" } },
+        { params: { fakultas: "febi" } },
+        { params: { fakultas: "fiskom" } },
+        { params: { fakultas: "farmasi" } },
+    ];
+}
+
+const { fakultas } = Astro.params;
+const kodeFakultas = fakultas?.toLowerCase();
+
+const FAKULTAS_ID_MAP: Record<string, number> = {
+    fiskom: 10,
+    febi: 11,
+    farmasi: 12,
+    fak: 13,
+    ft: 14,
+};
+
+const facultyDetails: Record<string, { name: string; desc: string }> = {
+    fak: {
+        name: "FAKULTAS AGAMA KRISTEN",
+        desc: "Fakultas Agama Kristen UKRIM berfokus pada nilai-nilai spiritual dan akademis.",
+    },
+    ft: {
+        name: "FAKULTAS TEKNIK",
+        desc: "Fakultas Teknik Ukrim memiliki program studi Teknik Sipil.",
+    },
+    febi: {
+        name: "FAKULTAS EKONOMI & BISNIS",
+        desc: "Mencetak wirausahawan dan profesional di bidang ekonomi kreatif.",
+    },
+    fiskom: {
+        name: "FAKULTAS SAINS & KOMPUTER",
+        desc: "Fakultas Sains dan Komputer memiliki 2 program studi yaitu Informatika dan Fisika.",
+    },
+    farmasi: {
+        name: "FARMASI FARMASI",
+        desc: "Berkomitmen pada kesehatan masyarakat melalui riset farmasi berkualitas.",
+    },
+};
+
+const currentFak = facultyDetails[kodeFakultas] || {
+    name: kodeFakultas?.toUpperCase(),
+    desc: "-",
+};
+const targetId = FAKULTAS_ID_MAP[kodeFakultas];
+
+// --- FETCH DATA ---
+const API_URL = "http://127.0.0.1:8055";
+let feedbackData: any[] = [];
+let errorMsg: string | null = null;
+
+let stats = {
+    total: 0,
+    positifPercent: 0,
+    sentimentCounts: { Positif: 0, Netral: 0, Negatif: 0 },
+};
+
+try {
+    const fields = [
+        "id",
+        "komentar",
+        "kategori_user",
+        "tanggal_kirim",
+        "analisis_detail.sentimen",
+        "analisis_detail.kategori",
+        "analisis_detail.text_potongan",
+    ].join(",");
+    const res = await fetch(
+        `${API_URL}/items/feedback?filter[fakultas_id][_eq]=${targetId}&fields=${fields}&sort=-tanggal_kirim`,
+    );
+    const json = await res.json();
+    feedbackData = json.data || [];
+
+    feedbackData.forEach((item) => {
+        const details = item.analisis_detail || [];
+        details.forEach((d: any) => {
+            const s = (d.sentimen || "").toLowerCase();
+            if (s.includes("positif")) stats.sentimentCounts.Positif++;
+            else if (s.includes("negatif")) stats.sentimentCounts.Negatif++;
+            else stats.sentimentCounts.Netral++;
+        });
+    });
+    stats.total = feedbackData.length;
+    const totalSentimen =
+        stats.sentimentCounts.Positif +
+        stats.sentimentCounts.Negatif +
+        stats.sentimentCounts.Netral;
+    stats.positifPercent =
+        totalSentimen > 0
+            ? Math.round((stats.sentimentCounts.Positif / totalSentimen) * 100)
+            : 0;
+} catch (e) {
+    errorMsg = "Gagal terhubung ke server.";
+}
+---
+
+<Layout title={`Fakultas ${currentFak.name}`}>
+    <Navbar />
+
+    <main class="container mx-auto px-6 py-10 max-w-6xl">
+        <div
+            class="flex flex-col md:flex-row items-center justify-between gap-8 mb-12"
+        >
+            <div class="space-y-4 text-center md:text-left flex-1">
+                <a
+                    href="/"
+                    class="text-xs font-bold text-blue-500 uppercase tracking-widest flex items-center justify-center md:justify-start gap-2 hover:underline"
+                >
+                    <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        ><path
+                            d="M15 19l-7-7 7-7"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"></path></svg
+                    > Dashboard
+                </a>
+
+                <div>
+                    <h1
+                        class="text-3xl md:text-5xl font-black text-gray-900 dark:text-white uppercase tracking-tight mb-2"
+                    >
+                        {currentFak.name}
+                    </h1>
+                    <p class="text-gray-500 text-sm max-w-lg leading-relaxed">
+                        {currentFak.desc}
+                    </p>
+                </div>
+
+                <div class="pt-2">
+                    <a
+                        href={`/feedback`}
+                        class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-bold shadow-lg shadow-blue-600/30 transform hover:-translate-y-1 transition-all duration-300 group"
+                    >
+                        <svg
+                            class="w-5 h-5 group-hover:rotate-12 transition-transform"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            ><path
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"></path></svg
+                        >
+                        <span>Beri Masukan Baru</span>
+                    </a>
+                </div>
+            </div>
+
+            <div
+                class="w-32 h-32 bg-white rounded-2xl shadow-xl flex items-center justify-center p-4 border border-gray-100 dark:border-gray-800 animate-float shrink-0"
+            >
+                <img
+                    src="/images/logo-ukrim.jpg"
+                    alt="Logo UKRIM"
+                    class="w-full h-full object-contain"
+                />
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-12">
+            <div
+                class="bg-white dark:bg-[#151921] p-5 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm hover:border-blue-500/30 transition-colors"
+            >
+                <p
+                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"
+                >
+                    Total Feedback
+                </p>
+                <p class="text-2xl font-black text-gray-900 dark:text-white">
+                    {stats.total}
+                </p>
+            </div>
+            <div
+                class="bg-white dark:bg-[#151921] p-5 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm hover:border-green-500/30 transition-colors"
+            >
+                <p
+                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"
+                >
+                    Kepuasan
+                </p>
+                <p class="text-2xl font-black text-green-500">
+                    {stats.positifPercent}%
+                </p>
+            </div>
+            <div
+                class="hidden md:block bg-white dark:bg-[#151921] p-5 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm"
+            >
+                <p
+                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"
+                >
+                    Status Data
+                </p>
+                <div class="flex items-center gap-2">
+                    <span class="relative flex h-2 w-2">
+                        <span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"
+                        ></span>
+                        <span
+                            class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"
+                        ></span>
+                    </span>
+                    <p
+                        class="text-lg font-black text-gray-700 dark:text-gray-300"
+                    >
+                        Live
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div
+                class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+            >
+                <h2
+                    class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2"
+                >
+                    <span class="w-1 h-5 bg-blue-600 rounded-full"></span>
+                    Riwayat Feedback
+                </h2>
+
+                <div class="flex flex-wrap gap-2">
+                    <select
+                        id="sortDate"
+                        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-lg text-[11px] font-bold p-2 outline-none cursor-pointer hover:border-blue-500 transition-colors"
+                    >
+                        <option value="newest" class="dark:bg-gray-800"
+                            >TERBARU</option
+                        >
+                        <option value="oldest" class="dark:bg-gray-800"
+                            >TERLAMA</option
+                        >
+                    </select>
+                    <select
+                        id="filterRole"
+                        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-lg text-[11px] font-bold p-2 outline-none cursor-pointer hover:border-blue-500 transition-colors"
+                    >
+                        <option value="all" class="dark:bg-gray-800"
+                            >SEMUA USER</option
+                        >
+                        <option value="mahasiswa" class="dark:bg-gray-800"
+                            >MAHASISWA</option
+                        >
+                        <option value="dosen" class="dark:bg-gray-800"
+                            >DOSEN</option
+                        >
+                    </select>
+                    <select
+                        id="filterSentiment"
+                        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white rounded-lg text-[11px] font-bold p-2 outline-none cursor-pointer hover:border-blue-500 transition-colors"
+                    >
+                        <option value="all" class="dark:bg-gray-800"
+                            >SEMUA SENTIMEN</option
+                        >
+                        <option value="positif" class="dark:bg-gray-800"
+                            >POSITIF</option
+                        >
+                        <option value="negatif" class="dark:bg-gray-800"
+                            >NEGATIF</option
+                        >
+                    </select>
+                </div>
+            </div>
+
+            <div id="feedbackContainer" class="grid grid-cols-1 gap-4">
+                {
+                    feedbackData.length === 0 ? (
+                        <div class="p-12 text-center text-gray-400 border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-2xl">
+                            {errorMsg || "Belum ada data feedback."}
+                        </div>
+                    ) : (
+                        feedbackData.map((item) => (
+                            <div
+                                class="feedback-card bg-white dark:bg-[#151921] border border-gray-100 dark:border-gray-800 rounded-xl overflow-hidden hover:border-blue-500/50 transition-all shadow-sm group"
+                                data-role={(
+                                    item.kategori_user || "mahasiswa"
+                                ).toLowerCase()}
+                                data-date={item.tanggal_kirim}
+                                data-sentiments={(
+                                    item.analisis_detail
+                                        ?.map((d: any) => d.sentimen || "")
+                                        .join(",") || ""
+                                ).toLowerCase()}
+                            >
+                                <div class="flex flex-col md:flex-row h-full">
+                                    <div class="md:w-1/3 p-5 bg-gray-50/50 dark:bg-white/5 border-b md:border-b-0 md:border-r border-gray-100 dark:border-gray-800 flex flex-col justify-between">
+                                        <div>
+                                            <div class="flex items-center gap-3 mb-3">
+                                                <div class="w-9 h-9 rounded-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center shadow-sm text-base">
+                                                    {item.kategori_user?.toLowerCase() ===
+                                                    "dosen"
+                                                        ? "👨‍🏫"
+                                                        : "🎓"}
+                                                </div>
+                                                <div>
+                                                    <span class="block text-[10px] font-black text-gray-900 dark:text-white uppercase leading-none tracking-tight">
+                                                        {item.kategori_user ||
+                                                            "Mahasiswa"}
+                                                    </span>
+                                                    <span class="block text-[9px] text-gray-400 font-bold mt-1 uppercase">
+                                                        {new Date(
+                                                            item.tanggal_kirim,
+                                                        ).toLocaleDateString(
+                                                            "id-ID",
+                                                            {
+                                                                day: "2-digit",
+                                                                month: "short",
+                                                                year: "numeric",
+                                                            },
+                                                        )}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <p class="text-xs text-gray-700 dark:text-gray-300 leading-relaxed italic line-clamp-4">
+                                                "{item.komentar}"
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-1 p-5 bg-white dark:bg-[#151921]">
+                                        <div class="flex flex-col gap-2 h-full">
+                                            {item.analisis_detail &&
+                                            item.analisis_detail.length > 0 ? (
+                                                item.analisis_detail.map(
+                                                    (d: any) => {
+                                                        const s = (
+                                                            d.sentimen || ""
+                                                        ).toLowerCase();
+                                                        const isPos =
+                                                            s.includes(
+                                                                "positif",
+                                                            );
+                                                        const isNeg =
+                                                            s.includes(
+                                                                "negatif",
+                                                            );
+                                                        // Styles
+                                                        const borderCol = isPos
+                                                            ? "border-green-500"
+                                                            : isNeg
+                                                              ? "border-red-500"
+                                                              : "border-gray-300";
+                                                        const bgCol = isPos
+                                                            ? "bg-green-50/50 dark:bg-green-900/10"
+                                                            : isNeg
+                                                              ? "bg-red-50/50 dark:bg-red-900/10"
+                                                              : "bg-gray-50/50 dark:bg-white/5";
+                                                        const textCol = isPos
+                                                            ? "text-green-700 dark:text-green-400"
+                                                            : isNeg
+                                                              ? "text-red-700 dark:text-red-400"
+                                                              : "text-gray-600 dark:text-gray-400";
+
+                                                        return (
+                                                            <div
+                                                                class={`px-3 py-2 border-l-[3px] rounded-r-lg ${borderCol} ${bgCol} flex flex-col justify-center`}
+                                                            >
+                                                                <div class="flex items-center justify-between mb-1">
+                                                                    <span class="text-[9px] font-black uppercase text-blue-600 dark:text-blue-400 tracking-widest">
+                                                                        #
+                                                                        {
+                                                                            d.kategori
+                                                                        }
+                                                                    </span>
+                                                                    <span
+                                                                        class={`text-[8px] font-bold px-1.5 rounded uppercase ${isPos ? "bg-green-200 text-green-800" : isNeg ? "bg-red-200 text-red-800" : "bg-gray-200 text-gray-700"}`}
+                                                                    >
+                                                                        {
+                                                                            d.sentimen
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                                <p
+                                                                    class={`text-[11px] font-medium leading-tight ${textCol}`}
+                                                                >
+                                                                    "
+                                                                    {
+                                                                        d.text_potongan
+                                                                    }
+                                                                    "
+                                                                </p>
+                                                            </div>
+                                                        );
+                                                    },
+                                                )
+                                            ) : (
+                                                <div class="h-full flex items-center justify-center text-gray-400 border border-dashed border-gray-200 dark:border-gray-800 rounded-lg">
+                                                    <p class="text-[10px] italic">
+                                                        Belum ada analisis
+                                                        detail.
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    )
+                }
+            </div>
+            <footer
+                class="container mx-auto px-6 py-10 flex flex-col md:flex-row justify-between items-center gap-6 border-t border-gray-200 dark:border-gray-800 mt-auto bg-white dark:bg-[#050505]"
+            >
+                <div
+                    class="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity"
+                >
+                    <div
+                        class="w-8 h-8 rounded-full bg-white overflow-hidden border border-gray-200"
+                    >
+                        <img
+                            src="/images/logo-ukrim.jpg"
+                            alt="Logo"
+                            class="w-full h-full object-cover"
+                        />
+                    </div>
+                    <span
+                        class="text-[10px] font-bold text-gray-500 leading-tight"
+                        >UNIVERSITAS<br />KRISTEN<br />IMMANUEL</span
+                    >
+                </div>
+
+                <div
+                    class="flex gap-8 text-[10px] md:text-xs font-bold text-gray-500 tracking-wider"
+                >
+                    <a href="/feedback" class="hover:text-blue-500 transition"
+                        >BERI FEEDBACK</a
+                    >
+                    <a href="/fakultas" class="hover:text-blue-500 transition"
+                        >FAKULTAS</a
+                    >
+                    <a href="/" class="text-blue-500 transition">HOME</a>
+                </div>
+            </footer>
+        </div>
+    </main>
+
+    <script is:inline>
+        function runFilter() {
+            const sortVal = document.getElementById("sortDate").value;
+            const roleVal = document
+                .getElementById("filterRole")
+                .value.toLowerCase();
+            const sentVal = document
+                .getElementById("filterSentiment")
+                .value.toLowerCase();
+
+            const container = document.getElementById("feedbackContainer");
+            const cards = Array.from(
+                document.getElementsByClassName("feedback-card"),
+            );
+
+            cards.forEach((card) => {
+                const role = (
+                    card.getAttribute("data-role") || ""
+                ).toLowerCase();
+                const sentiments = (
+                    card.getAttribute("data-sentiments") || ""
+                ).toLowerCase();
+
+                const matchesRole = roleVal === "all" || role === roleVal;
+                const matchesSent =
+                    sentVal === "all" || sentiments.includes(sentVal);
+
+                card.style.display =
+                    matchesRole && matchesSent ? "block" : "none";
+            });
+
+            const visibleCards = cards.filter(
+                (c) => c.style.display !== "none",
+            );
+            visibleCards.sort((a, b) => {
+                const dateA = new Date(a.getAttribute("data-date"));
+                const dateB = new Date(b.getAttribute("data-date"));
+                return sortVal === "newest" ? dateB - dateA : dateA - dateB;
+            });
+
+            visibleCards.forEach((card) => container.appendChild(card));
+        }
+
+        document
+            .getElementById("sortDate")
+            .addEventListener("change", runFilter);
+        document
+            .getElementById("filterRole")
+            .addEventListener("change", runFilter);
+        document
+            .getElementById("filterSentiment")
+            .addEventListener("change", runFilter);
+    </script>
+
+    <style>
+        @keyframes float {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        .animate-float {
+            animation: float 5s ease-in-out infinite;
+        }
+        select option {
+            background-color: inherit;
+            color: inherit;
+        }
+    </style>
+</Layout>

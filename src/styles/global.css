@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+/* Beritahu Tailwind untuk pakai config yang kita buat */
+@config "../../tailwind.config.mjs";
+
+/* Settingan font default Inter */
+@theme {
+  --font-sans: 'Inter', sans-serif;
+}

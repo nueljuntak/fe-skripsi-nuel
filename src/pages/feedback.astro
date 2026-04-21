@@ -1,0 +1,276 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/navbar.astro";
+---
+
+<Layout title="Formulir Feedback - UKRIM">
+    <Navbar />
+    <main class="container mx-auto px-6 mt-6 mb-20 relative min-h-screen">
+        
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-lg h-64 bg-blue-500/10 blur-[80px] rounded-full z-0 pointer-events-none"></div>
+
+        <div class="max-w-3xl mx-auto relative z-10">
+            
+            <div class="text-center mb-10 space-y-3">
+                <h1 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white leading-tight">
+                    Sampaikan <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Aspirasi</span>
+                </h1>
+                <p class="text-gray-500 dark:text-gray-400 text-sm max-w-md mx-auto leading-relaxed">
+                    Masukan Anda sangat berharga untuk kemajuan fakultas.
+                </p>
+            </div>
+
+            <div id="loading-screen" class="flex flex-col items-center justify-center py-16 bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-2xl">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Memuat Data User & Pertanyaan...</p>
+            </div>
+
+            <form id="feedbackForm" class="hidden bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-gray-800 rounded-3xl p-6 md:p-10 shadow-xl shadow-blue-900/5 animate-fade-in relative">
+                
+                <div class="space-y-10 relative z-20">
+                    
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Fakultas Anda Saat Ini</label>
+                        <div class="relative group">
+                            <input 
+                                type="text" 
+                                id="fakultasDisplay" 
+                                readonly 
+                                class="w-full bg-gray-100 dark:bg-[#151515] border border-gray-200 dark:border-gray-700 rounded-xl px-5 py-4 text-sm text-gray-600 dark:text-gray-300 font-bold cursor-not-allowed focus:outline-none"
+                                value="Memuat..."
+                            />
+                            <input type="hidden" id="fakultasId" required />
+                            
+                            <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                            </div>
+                        </div>
+                        <p id="fakultasError" class="text-xs text-red-500 hidden mt-1">
+                            * Akun Anda belum terhubung dengan fakultas manapun. Silakan hubungi admin.
+                        </p>
+                    </div>
+
+                    <hr class="border-dashed border-gray-200 dark:border-gray-800" />
+
+                    <div id="questions-container" class="space-y-10"></div>
+
+                    <hr class="border-dashed border-gray-200 dark:border-gray-800" />
+
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 ml-1">
+                                Komentar / Masukan
+                                <span class="ml-2 px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 text-[9px] normal-case">Dianalisis AI</span>
+                            </label>
+                            <textarea id="komentar" required rows="4" placeholder="Ceritakan pengalaman atau masukan Anda secara detail..." class="w-full bg-gray-50 dark:bg-[#121212] border border-gray-200 dark:border-gray-700 rounded-2xl p-5 text-sm text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-4">
+                        <button type="submit" id="submitBtn" class="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 hover:-translate-y-1 transition-all duration-200 text-sm tracking-widest uppercase disabled:opacity-50 disabled:cursor-not-allowed">
+                            Kirim Feedback
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="border-t border-gray-200 dark:border-gray-800 mt-auto bg-white dark:bg-[#0a0a0a]">
+        <div class="container mx-auto px-6 py-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="text-center md:text-left">
+                    <p class="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-1">
+                        Universitas Kristen Immanuel
+                    </p>
+                    <p class="text-[10px] text-gray-500 dark:text-gray-400">
+                        © 2026 UKRIM Feedback System.
+                    </p>
+                </div>
+                <div class="flex items-center gap-6">
+                    <a href="/" class="text-[10px] font-bold text-gray-400 hover:text-blue-600 transition-colors">HOME</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</Layout>
+
+<style>
+    .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+<script is:inline>
+  const API_URL = "https://nueljunt-backend-skripsi-nuel.hf.space"; 
+
+  (async function() {
+    const token = localStorage.getItem("access_token");
+    const loadingScreen = document.getElementById("loading-screen");
+    const form = document.getElementById("feedbackForm");
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Elements untuk Fakultas
+    const fakultasDisplay = document.getElementById("fakultasDisplay");
+    const fakultasIdInput = document.getElementById("fakultasId");
+    const fakultasError = document.getElementById("fakultasError");
+    
+    if (!token) { window.location.href = "/auth/login"; return; }
+
+    try {
+        // Fetch User Data + Fakultas Relation
+        // Pastikan di Directus field relasi di tabel users bernama 'fakultas'
+        const userRes = await fetch(`${API_URL}/users/me?fields=id,first_name,nama_panggilan,role.name,fakultas.id,fakultas.nama_fakultas`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!userRes.ok) throw new Error("Unauthorized");
+        const userData = (await userRes.json()).data;
+        
+        // --- 1. SET FAKULTAS ---
+        if (userData.fakultas && userData.fakultas.nama_fakultas) {
+            fakultasDisplay.value = userData.fakultas.nama_fakultas;
+            fakultasIdInput.value = userData.fakultas.id;
+        } else {
+            fakultasDisplay.value = "Tidak Terdaftar / Umum";
+            fakultasError.classList.remove("hidden");
+            // Optional: Disable submit jika wajib punya fakultas
+            // submitBtn.disabled = true; 
+        }
+
+        // --- 2. SET ROLE & QUESTIONS ---
+        const roleRaw = userData.role?.name?.toLowerCase() || "";
+        let fixedRole = "mahasiswa"; 
+        if (roleRaw.includes("dosen")) fixedRole = "dosen";
+        if (roleRaw.includes("staff") || roleRaw.includes("admin")) fixedRole = "staff";
+
+        // Fetch pertanyaan sesuai role
+        const qUrl = `${API_URL}/items/pertanyaan_feedback?filter[role][_icontains]=${fixedRole}&filter[status][_eq]=aktif&sort=urutan`;
+        const qRes = await fetch(qUrl, { headers: { 'Authorization': `Bearer ${token}` } });
+        const questions = (await qRes.json()).data;
+
+        renderQuestions(questions, fixedRole);
+        
+        // Show Form
+        loadingScreen.classList.add("hidden");
+        form.classList.remove("hidden");
+
+        function renderQuestions(data, role) {
+            const container = document.getElementById("questions-container");
+            if(!data || data.length === 0) {
+                container.innerHTML = `<div class="text-center p-6 border border-dashed border-gray-300 dark:border-gray-700 rounded-xl text-gray-500 text-sm">Tidak ada pertanyaan khusus untuk role: <span class="text-blue-500 font-bold uppercase">${role}</span></div>`;
+                return;
+            }
+            data.forEach(q => {
+                const html = `
+                    <div class="question-item group" data-id="${q.id}">
+                        <p class="mb-4 text-sm md:text-base font-bold text-gray-800 dark:text-gray-100 leading-snug">
+                            ${q.pertanyaan} <span class="text-red-500">*</span>
+                        </p>
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                            ${renderButtonOption(q.id, 1, "Sangat Buruk")}
+                            ${renderButtonOption(q.id, 2, "Buruk")}
+                            ${renderButtonOption(q.id, 3, "Cukup")}
+                            ${renderButtonOption(q.id, 4, "Baik")}
+                            ${renderButtonOption(q.id, 5, "Sangat Baik")}
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        function renderButtonOption(qId, val, label) {
+            return `
+            <label class="cursor-pointer relative">
+                <input type="radio" name="q_${qId}" value="${val}" class="peer sr-only" required>
+                <div class="w-full h-full p-3 flex flex-col items-center justify-center text-center border-2 rounded-xl transition-all duration-200
+                    border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#151515] text-gray-400 dark:text-gray-500
+                    hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20
+                    peer-checked:border-blue-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:shadow-lg peer-checked:scale-105">
+                    <span class="text-[10px] md:text-xs font-bold uppercase tracking-wider">${label}</span>
+                </div>
+            </label>
+            `;
+        }
+
+        // --- 3. SUBMIT HANDLER ---
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Validasi Fakultas
+            const fakultasVal = fakultasIdInput.value;
+            if(!fakultasVal) {
+                alert("Anda tidak terdaftar di fakultas manapun. Tidak dapat mengirim feedback.");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "MENGIRIM...";
+
+            try {
+                const answersPayload = [];
+                document.querySelectorAll('.question-item').forEach(item => {
+                    const qId = item.getAttribute('data-id');
+                    const checked = item.querySelector(`input[name="q_${qId}"]:checked`);
+                    if(checked) {
+                        answersPayload.push({
+                            pertanyaan_id: parseInt(qId),
+                            jawaban: parseInt(checked.value),
+                            user_id: userData.id
+                        });
+                    }
+                });
+
+                console.log(`Mengirim Feedback sebagai: ${fixedRole.toUpperCase()} dari Fakultas ID: ${fakultasVal}`);
+
+                const payload = {
+                    status_proses: "pending",
+                    user_id: userData.id,
+                    fakultas_id: parseInt(fakultasVal), // Ambil dari Hidden Input (Otomatis)
+                    komentar: document.getElementById('komentar').value,
+                    tanggal_kirim: new Date().toISOString(),
+                    kategori_user: fixedRole, 
+                    jawaban_feedback: answersPayload
+                    // Rating dihapus dari payload
+                };
+
+                const response = await fetch(`${API_URL}/items/feedback`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.status === 401) {
+                    alert("⚠️ Sesi habis. Login ulang.");
+                    localStorage.removeItem("access_token");
+                    window.location.href = "/auth/login";
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`Gagal mengirim (Status: ${response.status})`);
+                }
+
+                alert("✅ Feedback Berhasil Dikirim! Terima kasih.");
+                window.location.href = "/";
+
+            } catch (err) {
+                console.error(err);
+                if (err.message.includes("JSON")) {
+                      // Handle 204 No Content
+                      alert("✅ Terima kasih! Feedback tersimpan.");
+                      window.location.href = "/";
+                } else {
+                      alert("Gagal: " + err.message);
+                      submitBtn.disabled = false;
+                      submitBtn.innerText = "Kirim Feedback";
+                }
+            }
+        });
+
+    } catch (err) {
+        console.error("Auth Error:", err);
+        window.location.href = "/auth/login";
+    }
+  })();
+</script>
